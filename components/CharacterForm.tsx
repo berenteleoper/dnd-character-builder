@@ -9,6 +9,9 @@ type CharacterFormProps = {
     onClassChange: (nextClass: string) => void;
     onLevelChange: (nextLevel: number) => void;
     onAbilityChange: (abilityKey: AbilityName, nextValue: number) => void;
+    onReset: () => void;
+    onSave: () => void;
+    saveMessage: string;
 };
 
 export default function CharacterForm({
@@ -18,83 +21,110 @@ export default function CharacterForm({
     onClassChange,
     onLevelChange,
     onAbilityChange,
+    onReset,
+    onSave,
+    saveMessage,
 }: CharacterFormProps) {
-    return(
-      <section className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-      <h2 className="mb-4 text-2xl font-semibold">Character Form</h2>
+    return (
+        <section className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+            <h2 className="mb-4 text-2xl font-semibold">Character Form</h2>
 
-      <div className="space-y-4">
-        <div>
-          <label className="mb-1 block text-sm font-medium">Name</label>
-          <input
-            type="text"
-            value={character.name}
-            onChange={(e) => onNameChange(e.target.value)}
-            placeholder="Enter character name"
-            className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-2 outline-none"
-          />
-        </div>
+            <div className="space-y-4">
+                <div>
+                    <label className="mb-1 block text-sm font-medium">Name</label>
+                    <input
+                        type="text"
+                        value={character.name}
+                        onChange={(e) => onNameChange(e.target.value)}
+                        placeholder="Enter character name"
+                        className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-2 outline-none"
+                    />
+                </div>
 
-        <div>
-          <label className="mb-1 block text-sm font-medium">Race</label>
-          <select
-            value={character.race}
-            onChange={(e) => onRaceChange(e.target.value)}
-            className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-2 outline-none"
-          >
-            <option value="Human">Human</option>
-            <option value="Elf">Elf</option>
-            <option value="Dwarf">Dwarf</option>
-            <option value="Halfling">Halfling</option>
-          </select>
-        </div>
+                <div>
+                    <label className="mb-1 block text-sm font-medium">Race</label>
+                    <select
+                        value={character.race}
+                        onChange={(e) => onRaceChange(e.target.value)}
+                        className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-2 outline-none"
+                    >
+                        <option value="Human">Human</option>
+                        <option value="Elf">Elf</option>
+                        <option value="Dwarf">Dwarf</option>
+                        <option value="Halfling">Halfling</option>
+                    </select>
+                </div>
 
-        <div>
-          <label className="mb-1 block text-sm font-medium">Class</label>
-          <select
-            value={character.class}
-            onChange={(e) => onClassChange(e.target.value)}
-            className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-2 outline-none"
-          >
-            <option value="Fighter">Fighter</option>
-            <option value="Wizard">Wizard</option>
-            <option value="Rogue">Rogue</option>
-            <option value="Cleric">Cleric</option>
-          </select>
-        </div>
+                <div>
+                    <label className="mb-1 block text-sm font-medium">Class</label>
+                    <select
+                        value={character.class}
+                        onChange={(e) => onClassChange(e.target.value)}
+                        className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-2 outline-none"
+                    >
+                        <option value="Fighter">Fighter</option>
+                        <option value="Wizard">Wizard</option>
+                        <option value="Rogue">Rogue</option>
+                        <option value="Cleric">Cleric</option>
+                    </select>
+                </div>
 
-        <div>
-          <label className="mb-1 block text-sm font-medium">Level</label>
-          <input
-            type="number"
-            min={1}
-            max={20}
-            value={character.level}
-            onFocus={(e) => e.target.select()}
-            onChange={(e) => {
-              const nextLevel = e.target.valueAsNumber;
-              onLevelChange(Number.isNaN(nextLevel) ? 1 : nextLevel);
-            }}
-            className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-2 outline-none"
-          />
-        </div>
+                <div>
+                    <label className="mb-1 block text-sm font-medium">Level</label>
+                    <input
+                        type="number"
+                        min={1}
+                        max={20}
+                        value={character.level}
+                        onFocus={(e) => e.target.select()}
+                        onChange={(e) => {
+                            const nextLevel = e.target.valueAsNumber;
+                            onLevelChange(Number.isNaN(nextLevel) ? 1 : nextLevel);
+                        }}
+                        className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-2 outline-none"
+                    />
+                </div>
 
-        <div>
-          <h3 className="mb-3 text-lg font-semibold">Ability Scores</h3>
+                <div>
+                    <h3 className="mb-3 text-lg font-semibold">Ability Scores</h3>
 
-          <div className="space-y-3">
-            {abilityList.map((ability) => (
-              <AbilityInputRow
-                key={ability.key}
-                abilityKey={ability.key}
-                label={ability.label}
-                value={character.abilities[ability.key]}
-                onChange={onAbilityChange}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
+                    <div className="space-y-3">
+                        {abilityList.map((ability) => (
+                            <AbilityInputRow
+                                key={ability.key}
+                                abilityKey={ability.key}
+                                label={ability.label}
+                                value={character.abilities[ability.key]}
+                                onChange={onAbilityChange}
+                            />
+                        ))}
+                    </div>
+                </div>
+                
+                <div className="pt-2">
+                    <button
+                        type="button"
+                        onClick={onSave}
+                        className="w-full rounded-xl bg-emerald-600 px-4 py-3 font-semibold text-white transition hover:bg-emerald-500"
+                    >
+                        Save Character
+                    </button>
+
+                    {saveMessage && (
+                        <p className="mt-2 text-sm text-emerald-400">{saveMessage}</p>
+                    )}
+                </div>
+
+                <div className="pt-2">
+                    <button
+                        type="button"
+                        onClick={onReset}
+                        className="w-full rounded-xl border border-red-500 px-4 py-3 font-semibold text-red-400 transition hover:bg-red-500/10"
+                    >
+                        Reset Character
+                    </button>
+                </div>
+            </div>
+        </section>
+    );
 }
