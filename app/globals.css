@@ -2,7 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  background: #d8ccb2;
+}
+
 body {
-  background-color: #000000; 
-  color: white;
+  background:
+    radial-gradient(circle at top, rgba(255, 248, 235, 0.75), transparent 35%),
+    linear-gradient(180deg, #d9ccb3 0%, #cfc0a4 100%);
+  color: #2f241c;
+}
+
+* {
+  box-sizing: border-box;
 }

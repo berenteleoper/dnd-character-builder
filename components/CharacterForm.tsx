@@ -11,6 +11,7 @@ type CharacterFormProps = {
     onAbilityChange: (abilityKey: AbilityName, nextValue: number) => void;
     onReset: () => void;
     onSave: () => void;
+    onUpdate: () => void;
     saveMessage: string;
 };
 
@@ -23,10 +24,11 @@ export default function CharacterForm({
     onAbilityChange,
     onReset,
     onSave,
+    onUpdate,
     saveMessage,
 }: CharacterFormProps) {
     return (
-        <section className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+        <section className="rounded-2xl border-2 border-[#8f2f2f] bg-[#f7efe4] p-6 text-[#2f241c] shadow-lg">
             <h2 className="mb-4 text-2xl font-semibold">Character Form</h2>
 
             <div className="space-y-4">
@@ -66,6 +68,14 @@ export default function CharacterForm({
                         <option value="Wizard">Wizard</option>
                         <option value="Rogue">Rogue</option>
                         <option value="Cleric">Cleric</option>
+                        <option value="Druid">Druid</option>
+                        <option value="Warlock">Warlock</option>
+                        <option value="Barbarian">Barbarian</option>
+                        <option value="Paladin">Paladin</option>
+                        <option value="Ranger">Ranger</option>
+                        <option value="Bard">Bard</option>
+                        <option value="Monk">Monk</option>
+                        <option value="Sorcerer">Sorcerer</option>
                     </select>
                 </div>
 
@@ -100,20 +110,14 @@ export default function CharacterForm({
                         ))}
                     </div>
                 </div>
-                
-                <div className="pt-2">
-                    <button
-                        type="button"
-                        onClick={onSave}
-                        className="w-full rounded-xl bg-emerald-600 px-4 py-3 font-semibold text-white transition hover:bg-emerald-500"
-                    >
-                        Save Character
-                    </button>
 
-                    {saveMessage && (
-                        <p className="mt-2 text-sm text-emerald-400">{saveMessage}</p>
-                    )}
-                </div>
+                <button
+                    type="button"
+                    onClick={character.id ? onUpdate : onSave}
+                    className="w-full rounded-xl bg-emerald-600 px-4 py-3 font-semibold text-white transition hover:bg-emerald-500"
+                >
+                    {character.id ? "Update Character" : "Save Character"}
+                </button>
 
                 <div className="pt-2">
                     <button

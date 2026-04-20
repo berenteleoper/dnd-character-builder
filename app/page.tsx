@@ -7,8 +7,10 @@ import CharacterModal from "@/components/CharacterModal";
 import { abilityList } from "../data/abilities";
 import { calculateModifier } from "../lib/ability";
 import type { AbilityName, Character } from "../types/character";
+import CharacterPreview from "../components/CharacterPreview";
 
 const initialCharacter: Character = {
+  id: "",
   name: "",
   race: "Human",
   class: "Fighter",
@@ -29,6 +31,8 @@ export default function Home() {
   const [savedCharacters, setSavedCharacters] = useState<Character[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null);
+  const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(null);
+
 
   useEffect(() => {
     try {
@@ -56,6 +60,10 @@ export default function Home() {
 
     localStorage.setItem("character", JSON.stringify(character));
   }, [character, isLoaded]);
+
+  function createCharacterId() {
+    return crypto.randomUUID();
+  }
 
   function handleNameChange(nextName: string) {
     setCharacter({
@@ -108,10 +116,19 @@ export default function Home() {
       }
     }
 
-    characters.push(character);
+    const characterToSave: Character = {
+      ...character,
+      id: createCharacterId(),
+      abilities: {
+        ...character.abilities,
+      },
+    };
+
+    characters.push(characterToSave);
 
     localStorage.setItem("characters", JSON.stringify(characters));
     setSavedCharacters(characters);
+    setCharacter(characterToSave);
 
     setSaveMessage("Character saved!");
 
@@ -121,12 +138,13 @@ export default function Home() {
   }
 
   function handleOpenCharacterModal(selected: Character) {
-    console.log("clicked character:", selected.name);
     setSelectedCharacter(selected);
+    setSelectedCharacterId(selected.id);
   }
 
   function handleCloseCharacterModal() {
     setSelectedCharacter(null);
+    setSelectedCharacterId(null);
   }
 
   function handleResetCharacter() {
@@ -135,21 +153,62 @@ export default function Home() {
   }
 
   function handleLoadCharacterIntoForm(selected: Character) {
-  setCharacter({
-    ...selected,
-    abilities: {
-      ...selected.abilities,
-    },
-  });
-  setSelectedCharacter(null);
-  setSaveMessage("");
-}
+    setCharacter({
+      ...selected,
+      abilities: {
+        ...selected.abilities,
+      },
+    });
+    setSelectedCharacter(null);
+    setSelectedCharacterId(null);
+    setSaveMessage("");
+  }
+
+  function handleDeleteCharacter() {
+    if (!selectedCharacterId) return;
+
+    const updatedCharacters = savedCharacters.filter(
+      (savedCharacter) => savedCharacter.id !== selectedCharacterId
+    );
+
+    setSavedCharacters(updatedCharacters);
+    localStorage.setItem("characters", JSON.stringify(updatedCharacters));
+
+    setSelectedCharacter(null);
+    setSelectedCharacterId(null);
+    setSaveMessage("");
+  }
+
+  function handleUpdateCharacter() {
+    if (!character.id) return;
+
+    const updatedCharacters = savedCharacters.map((savedCharacters) =>
+      savedCharacters.id === character.id
+        ? {
+          ...character,
+          abilities: {
+            ...character.abilities,
+          },
+        }
+        : savedCharacters
+    );
+
+    setSavedCharacters(updatedCharacters);
+    localStorage.setItem("characters", JSON.stringify(updatedCharacters));
+    localStorage.setItem("character", JSON.stringify(character));
+
+    setSaveMessage("Character updated!");
+
+    setTimeout(() => {
+      setSaveMessage("");
+    }, 2000);
+  }
 
   return (
-    <main className="min-h-screen bg-slate-950 px-6 py-10 text-white">
+    <main className="min-h-screen px-6 py-10 text-[#2f241c]">
       <div className="mx-auto max-w-5xl">
         <h1 className="mb-2 text-3xl font-bold">DnD Character Builder</h1>
-        <p className="mb-8 text-slate-300">
+        <p className="mb-8 text-[#5a4a3d]">
           DnD Character Sheet
         </p>
 
@@ -163,6 +222,7 @@ export default function Home() {
             onAbilityChange={handleAbilityChange}
             onReset={handleResetCharacter}
             onSave={handleSaveCharacter}
+            onUpdate={handleUpdateCharacter}
             saveMessage={saveMessage}
           />
 
@@ -210,7 +270,7 @@ export default function Home() {
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {savedCharacters.map((savedCharacter, index) => (
                   <div
-                    key={`${savedCharacter.name}-${index}`}
+                    key={savedCharacter.id || index}
                     onClick={() => handleOpenCharacterModal(savedCharacter)}
                     className="cursor-pointer rounded-xl border border-slate-700 bg-slate-800 p-4 transition hover:border-slate-500 hover:bg-slate-700"
                   >
@@ -237,13 +297,14 @@ export default function Home() {
         </div>
       </div>
       {selectedCharacter && (
-  <p className="text-red-400">MODAL STATE ACTIVE: {selectedCharacter.name}</p>
-)}
+        <p className="text-red-400">MODAL STATE ACTIVE: {selectedCharacter.name}</p>
+      )}
 
       <CharacterModal
         character={selectedCharacter}
         onClose={handleCloseCharacterModal}
         onLoadIntoForm={handleLoadCharacterIntoForm}
+        onDelete={handleDeleteCharacter}
       />
     </main>
   );

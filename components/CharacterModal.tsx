@@ -8,12 +8,14 @@ type CharacterModalProps = {
     character: Character | null;
     onClose: () => void;
     onLoadIntoForm: (character: Character) => void;
+    onDelete: () => void;
 };
 
 export default function CharacterModal({
     character,
     onClose,
     onLoadIntoForm,
+    onDelete,
 }: CharacterModalProps) {
     if (!character) return null;
 
@@ -93,7 +95,15 @@ export default function CharacterModal({
                         onClick={() => onLoadIntoForm(character)}
                         className="rounded-lg bg-emerald-600 px-4 py-2 font-semibold text-white transition hover:bg-emerald-500"
                     >
-                        Load into Form
+                        Edit in Form
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={onDelete}
+                        className="rounded-lg border border-red-500 px-4 py-2 font-semibold text-red-400 transition hover:bg-red-500/10"
+                    >
+                        Delete Character
                     </button>
                 </div>
             </div>
