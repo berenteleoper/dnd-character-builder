@@ -10,7 +10,7 @@ export const classThemes: Record<string, ClassTheme> = {
   Fighter: {
     primary: "#9f2f2f",
     border: "#7f1d1d",
-    soft: "#f4d8d8",
+    soft: "#fff7f5",
     panel: "#f7efe4",
     text: "#3a1f1f",
   },

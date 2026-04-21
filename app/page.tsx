@@ -6,7 +6,17 @@ import CharacterForm from "../components/CharacterForm";
 import CharacterModal from "@/components/CharacterModal";
 import { abilityList } from "../data/abilities";
 import { calculateModifier } from "../lib/ability";
-import type { AbilityName, Character } from "../types/character";
+import {
+  buildAbilitiesFromStandardArray,
+  generateRolledAbilities,
+  standardArrayValues,
+} from "../lib/ability-generation";
+import type {
+  AbilityGenerationMethod,
+  AbilityName,
+  Character,
+  StandardArrayValue,
+} from "../types/character";
 import CharacterPreview from "../components/CharacterPreview";
 
 const initialCharacter: Character = {
@@ -15,6 +25,8 @@ const initialCharacter: Character = {
   race: "Human",
   class: "Fighter",
   level: 1,
+  generationMethod: "manual",
+  standardArrayAssignments: {},
   abilities: {
     strength: 10,
     dexterity: 10,
@@ -100,6 +112,37 @@ export default function Home() {
         ...character.abilities,
         [abilityKey]: nextValue,
       },
+    });
+  }
+
+  function handleGenerationMethodChange(method: AbilityGenerationMethod) {
+    setCharacter({
+      ...character,
+      generationMethod: method,
+      standardArrayAssignments: method === "standardArray" ? {} : {},
+    });
+  }
+
+  function handleRollAbilities() {
+    setCharacter({
+      ...character,
+      abilities: generateRolledAbilities(),
+    });
+  }
+
+  function handleStandardArrayAssignment(
+    abilityKey: AbilityName,
+    value: StandardArrayValue
+  ) {
+    const nextAssignments = {
+      ...(character.standardArrayAssignments ?? {}),
+      [abilityKey]: value,
+    };
+
+    setCharacter({
+      ...character,
+      standardArrayAssignments: nextAssignments,
+      abilities: buildAbilitiesFromStandardArray(nextAssignments),
     });
   }
 
@@ -206,13 +249,17 @@ export default function Home() {
 
   return (
     <main className="min-h-screen px-6 py-10 text-[#2f241c]">
-      <div className="mx-auto max-w-5xl">
-        <h1 className="mb-2 text-3xl font-bold">DnD Character Builder</h1>
-        <p className="mb-8 text-[#5a4a3d]">
-          DnD Character Sheet
-        </p>
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold tracking-tight text-[#2f241c]">
+            DnD Character Builder
+          </h1>
+          <p className="mt-2 text-base text-[#6a5848]">
+            Create, save, edit, and manage your character sheet.
+          </p>
+        </div>
 
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid items-start gap-6 lg:grid-cols-2">
           <CharacterForm
             character={character}
             onNameChange={handleNameChange}
@@ -220,14 +267,17 @@ export default function Home() {
             onClassChange={handleClassChange}
             onLevelChange={handleLevelChange}
             onAbilityChange={handleAbilityChange}
+            onGenerationMethodChange={handleGenerationMethodChange}
+            onRollAbilities={handleRollAbilities}
+            onStandardArrayAssignmentChange={handleStandardArrayAssignment}
             onReset={handleResetCharacter}
             onSave={handleSaveCharacter}
             onUpdate={handleUpdateCharacter}
             saveMessage={saveMessage}
           />
 
-          <section className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-            <h2 className="mb-4 text-2xl font-semibold">
+          <section className="rounded-3xl border border-[#c8b79e] bg-[#f8f1e7] p-6 shadow-[0_10px_30px_rgba(60,40,20,0.08)]">
+            <h2 className="mb-4 text-2xl font-semibold text-[#2f241c]">
               {character.name || "Unnamed Character"}
             </h2>
 
@@ -258,44 +308,48 @@ export default function Home() {
               })}
             </div>
           </section>
-          <p className="mb-4 text-sm text-yellow-400">
-            Selected: {selectedCharacter ? selectedCharacter.name : "none"}
-          </p>
-          <section className="mt-8 rounded-2xl border border-slate-800 bg-slate-900 p-6">
-            <h2 className="mb-4 text-2xl font-semibold">Saved Characters</h2>
-
-            {savedCharacters.length === 0 ? (
-              <p className="text-slate-400">No saved characters yet.</p>
-            ) : (
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                {savedCharacters.map((savedCharacter, index) => (
-                  <div
-                    key={savedCharacter.id || index}
-                    onClick={() => handleOpenCharacterModal(savedCharacter)}
-                    className="cursor-pointer rounded-xl border border-slate-700 bg-slate-800 p-4 transition hover:border-slate-500 hover:bg-slate-700"
-                  >
-                    <h3 className="mb-2 text-xl font-semibold">
-                      {savedCharacter.name || "Unnamed Character"}
-                    </h3>
-
-                    <div className="space-y-1 text-sm text-slate-300">
-                      <p>
-                        <span className="font-semibold">Race:</span> {savedCharacter.race}
-                      </p>
-                      <p>
-                        <span className="font-semibold">Class:</span> {savedCharacter.class}
-                      </p>
-                      <p>
-                        <span className="font-semibold">Level:</span> {savedCharacter.level}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
         </div>
+
+        <section className="mt-8 rounded-3xl border border-[#c8b79e] bg-[#f8f1e7] p-6 shadow-[0_10px_30px_rgba(60,40,20,0.08)]">
+          <h2 className="mb-4 text-3xl font-bold tracking-tight text-[#2f241c]">
+            Saved Characters
+          </h2>
+
+          {savedCharacters.length === 0 ? (
+            <p className="text-[#6a5848]">No saved characters yet.</p>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {savedCharacters.map((savedCharacter, index) => (
+                <div
+                  key={savedCharacter.id || index}
+                  onClick={() => handleOpenCharacterModal(savedCharacter)}
+                  className="cursor-pointer rounded-2xl border border-[#ddd0bc] bg-[#fffaf3] p-4 transition hover:-translate-y-0.5 hover:border-[#b14545] hover:shadow-md"
+                >
+                  <h3 className="mb-2 text-xl font-semibold text-[#2f241c]">
+                    {savedCharacter.name || "Unnamed Character"}
+                  </h3>
+
+                  <div className="space-y-1 text-sm text-[#5f4d3d]">
+                    <p>
+                      <span className="font-semibold text-[#2f241c]">Race:</span>{" "}
+                      {savedCharacter.race}
+                    </p>
+                    <p>
+                      <span className="font-semibold text-[#2f241c]">Class:</span>{" "}
+                      {savedCharacter.class}
+                    </p>
+                    <p>
+                      <span className="font-semibold text-[#2f241c]">Level:</span>{" "}
+                      {savedCharacter.level}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
       </div>
+
       {selectedCharacter && (
         <p className="text-red-400">MODAL STATE ACTIVE: {selectedCharacter.name}</p>
       )}

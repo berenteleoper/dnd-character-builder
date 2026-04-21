@@ -1,3 +1,7 @@
+export type AbilityGenerationMethod = "manual" | "standardArray" | "diceRoll";
+
+export type StandardArrayValue = 15 | 14 | 13 | 12 | 10 | 8;
+
 export type AbilityName = 
 | "strength"
 | "dexterity"
@@ -21,5 +25,8 @@ export type Character = {
     race: string;
     class: string;
     level: number;
+    generationMethod: AbilityGenerationMethod;
     abilities: AbilityScores;
+    standardArrayAssignments?: Partial<Record<AbilityName, StandardArrayValue>>;
 }
+

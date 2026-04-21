@@ -13,13 +13,13 @@ export default function AbilityCard({
   value,
   modifier,
   accentColor = "#9f2f2f",
-  borderColor = "#7f1d1d",
-  backgroundColor = "#f4d8d8",
+  borderColor = "#b14545",
+  backgroundColor = "#fffaf3",
   textColor = "#2f241c",
 }: AbilityCardProps) {
   return (
     <div
-      className="rounded-xl border-2 p-4 shadow-sm"
+      className="rounded-3xl border p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
       style={{
         borderColor,
         backgroundColor,
@@ -27,18 +27,21 @@ export default function AbilityCard({
       }}
     >
       <p
-        className="text-xs font-bold uppercase tracking-wider"
+        className="text-[11px] font-bold uppercase tracking-[0.18em]"
         style={{ color: accentColor }}
       >
         {name}
       </p>
 
-      <div className="mt-2 flex items-end justify-between">
-        <p className="text-4xl font-bold">{value}</p>
-        <p className="text-lg font-semibold">
-          {modifier >= 0 ? "+" : ""}
-          {modifier}
-        </p>
+      <div className="mt-4 flex items-end justify-between">
+        <p className="text-6xl font-bold leading-none">{value}</p>
+
+        <div className="rounded-xl bg-[#f4ecdf] px-3 py-2">
+          <p className="text-xl font-semibold" style={{ color: accentColor }}>
+            {modifier >= 0 ? "+" : ""}
+            {modifier}
+          </p>
+        </div>
       </div>
     </div>
   );
