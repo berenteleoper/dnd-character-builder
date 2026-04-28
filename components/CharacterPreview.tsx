@@ -3,7 +3,11 @@ import { abilityList } from "../data/abilities";
 import { calculateModifier } from "../lib/ability";
 import { getClassTheme } from "../lib/theme";
 import type { Character } from "../types/character";
-import { getFinalAbilityScore, getRaceBonuses, getRaceTraits } from "../lib/race";
+import {
+  getCombinedRaceBonuses,
+  getCombinedRaceTraits,
+  getFinalAbilityScore,
+} from "../lib/race";
 
 type CharacterPreviewProps = {
   character: Character;
@@ -14,9 +18,15 @@ export default function CharacterPreview({
 }: CharacterPreviewProps) {
   const theme = getClassTheme(character.class);
 
-  const raceBonuses = getRaceBonuses(character.race);
+  const raceBonuses =
+    character.ruleset === "2014"
+      ? getCombinedRaceBonuses(character.race, character.subrace)
+      : {};
 
-  const raceTraits = getRaceTraits(character.race);
+  const raceTraits =
+    character.ruleset === "2014"
+      ? getCombinedRaceTraits(character.race, character.subrace)
+      : [];
 
   const raceBonusEntries = abilityList
     .map((ability) => ({
@@ -42,17 +52,37 @@ export default function CharacterPreview({
 
         <div className="flex flex-col gap-4 p-5">
           <div className="flex items-start justify-between gap-4">
-            <div>
-              <p
-                className="mb-2 text-xs font-bold uppercase tracking-[0.18em]"
-                style={{ color: theme.primary }}
+            <div className="flex items-center gap-4">
+              <div
+                className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-3xl border bg-[#f4ecdf] text-3xl font-bold"
+                style={{
+                  borderColor: theme.border,
+                  color: theme.primary,
+                }}
               >
-                Character Preview
-              </p>
+                {character.avatarUrl ? (
+                  <img
+                    src={character.avatarUrl}
+                    alt={character.name || "Character avatar"}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <span>{(character.name || "?").charAt(0).toUpperCase()}</span>
+                )}
+              </div>
 
-              <h2 className="text-4xl font-bold leading-tight text-[#2f241c]">
-                {character.name || "Unnamed Character"}
-              </h2>
+              <div>
+                <p
+                  className="mb-2 text-xs font-bold uppercase tracking-[0.18em]"
+                  style={{ color: theme.primary }}
+                >
+                  Character Preview
+                </p>
+
+                <h2 className="text-4xl font-bold leading-tight text-[#2f241c]">
+                  {character.name || "Unnamed Character"}
+                </h2>
+              </div>
             </div>
 
             <div
@@ -87,13 +117,17 @@ export default function CharacterPreview({
         {abilityList.map((ability) => {
           const baseValue = character.abilities[ability.key];
 
-          const finalValue = getFinalAbilityScore(
-            ability.key,
-            character.abilities,
-            character.race
-          );
+          const finalValue =
+            character.ruleset === "2014"
+              ? getFinalAbilityScore(
+                ability.key,
+                character.abilities,
+                character.race,
+                character.subrace
+              )
+              : character.abilities[ability.key];
 
-          const raceBonus = getRaceBonuses(character.race)[ability.key] ?? 0;
+          const raceBonus = raceBonuses[ability.key] ?? 0;
 
           return (
             <AbilityCard

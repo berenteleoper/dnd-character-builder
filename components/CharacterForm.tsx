@@ -10,6 +10,7 @@ import type {
   AbilityGenerationMethod,
   AbilityName,
   Character,
+  Ruleset,
   StandardArrayValue,
 } from "../types/character";
 import AbilityInputRow from "./AbilityInputRow";
@@ -18,8 +19,11 @@ type CharacterFormProps = {
   character: Character;
   onNameChange: (nextName: string) => void;
   onRaceChange: (nextRace: string) => void;
+  onSubraceChange: (nextSubrace: string) => void;
   onClassChange: (nextClass: string) => void;
   onLevelChange: (nextLevel: number) => void;
+  onRulesetChange: (nextRuleset: Ruleset) => void;
+  onAvatarUrlChange: (nextAvatarUrl: string) => void;
   onAbilityChange: (abilityKey: AbilityName, nextValue: number) => void;
   onGenerationMethodChange: (method: AbilityGenerationMethod) => void;
   onStandardArrayAssignmentChange: (
@@ -37,8 +41,11 @@ export default function CharacterForm({
   character,
   onNameChange,
   onRaceChange,
+  onSubraceChange,
   onClassChange,
   onLevelChange,
+  onRulesetChange,
+  onAvatarUrlChange,
   onAbilityChange,
   onGenerationMethodChange,
   onStandardArrayAssignmentChange,
@@ -49,6 +56,8 @@ export default function CharacterForm({
   saveMessage,
 }: CharacterFormProps) {
   const assignedValues = Object.values(character.standardArrayAssignments ?? {});
+  const selectedRace = races.find((race) => race.name === character.race);
+  const availableSubraces = selectedRace?.subraces ?? [];
   const pointBuyUsedPoints = calculatePointBuyCost(character.abilities);
   const pointBuyRemainingPoints = getPointBuyRemainingPoints(character.abilities);
 
@@ -71,6 +80,20 @@ export default function CharacterForm({
         </div>
 
         <div>
+          <label className="mb-1 block text-sm font-medium">Avatar Image URL</label>
+          <input
+            type="text"
+            value={character.avatarUrl}
+            onChange={(e) => onAvatarUrlChange(e.target.value)}
+            placeholder="Paste an image URL"
+            className="w-full rounded-2xl border border-[#d6c7b2] bg-[#fffaf3] px-4 py-3 text-[#2f241c] outline-none transition focus:border-[#b14545] focus:ring-2 focus:ring-[#b14545]/20"
+          />
+          <p className="mt-2 text-sm text-[#6a5848]">
+            For now, use a direct image URL. File upload will come later.
+          </p>
+        </div>
+
+        <div>
           <label className="mb-1 block text-sm font-medium">Race</label>
           <select
             value={character.race}
@@ -87,6 +110,25 @@ export default function CharacterForm({
             Race bonuses are applied automatically in the preview.
           </p>
         </div>
+
+        {availableSubraces.length > 0 && (
+          <div>
+            <label className="mb-1 block text-sm font-medium">Subrace</label>
+            <select
+              value={character.subrace}
+              onChange={(e) => onSubraceChange(e.target.value)}
+              className="w-full rounded-2xl border border-[#d6c7b2] bg-[#fffaf3] px-4 py-3 text-[#2f241c] outline-none transition focus:border-[#b14545] focus:ring-2 focus:ring-[#b14545]/20"
+            >
+              <option value="">Select subrace</option>
+
+              {availableSubraces.map((subrace) => (
+                <option key={subrace.name} value={subrace.name}>
+                  {subrace.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <div>
           <label className="mb-1 block text-sm font-medium">Class</label>
@@ -108,6 +150,22 @@ export default function CharacterForm({
             <option value="Monk">Monk</option>
             <option value="Sorcerer">Sorcerer</option>
           </select>
+        </div>
+
+        <div>
+          <label className="mb-1 block text-sm font-medium">Ruleset</label>
+          <select
+            value={character.ruleset}
+            onChange={(e) => onRulesetChange(e.target.value as Ruleset)}
+            className="w-full rounded-2xl border border-[#d6c7b2] bg-[#fffaf3] px-4 py-3 text-[#2f241c] outline-none transition focus:border-[#b14545] focus:ring-2 focus:ring-[#b14545]/20"
+          >
+            <option value="2014">D&D 5e 2014</option>
+            <option value="2024">D&D 2024</option>
+          </select>
+
+          <p className="mt-2 text-sm text-[#6a5848]">
+            2014 uses race ability bonuses. 2024 will use background-based bonuses later.
+          </p>
         </div>
 
         <div>

@@ -18,6 +18,7 @@ import type {
   AbilityGenerationMethod,
   AbilityName,
   Character,
+  Ruleset,
   StandardArrayValue,
 } from "../types/character";
 import CharacterPreview from "@/components/CharacterPreview";
@@ -26,10 +27,13 @@ const initialCharacter: Character = {
   id: "",
   name: "",
   race: "Human",
+  subrace: "",
   class: "Fighter",
   level: 1,
+  ruleset: "2014",
   generationMethod: "manual",
   standardArrayAssignments: {},
+  avatarUrl: "",
   abilities: {
     strength: 10,
     dexterity: 10,
@@ -80,6 +84,13 @@ export default function Home() {
     return crypto.randomUUID();
   }
 
+  function handleAvatarUrlChange(nextAvatarUrl: string) {
+    setCharacter({
+      ...character,
+      avatarUrl: nextAvatarUrl,
+    });
+  }
+
   function handleNameChange(nextName: string) {
     setCharacter({
       ...character,
@@ -91,6 +102,14 @@ export default function Home() {
     setCharacter({
       ...character,
       race: nextRace,
+      subrace: "",
+    });
+  }
+
+  function handleSubraceChange(nextSubrace: string) {
+    setCharacter({
+      ...character,
+      subrace: nextSubrace,
     });
   }
 
@@ -179,6 +198,13 @@ export default function Home() {
       ...character,
       standardArrayAssignments: nextAssignments,
       abilities: buildAbilitiesFromStandardArray(nextAssignments),
+    });
+  }
+
+  function handleRulesetChange(nextRuleset: Ruleset) {
+    setCharacter({
+      ...character,
+      ruleset: nextRuleset,
     });
   }
 
@@ -300,8 +326,11 @@ export default function Home() {
             character={character}
             onNameChange={handleNameChange}
             onRaceChange={handleRaceChange}
+            onSubraceChange={handleSubraceChange}
             onClassChange={handleClassChange}
             onLevelChange={handleLevelChange}
+            onRulesetChange={handleRulesetChange}
+            onAvatarUrlChange={handleAvatarUrlChange}
             onAbilityChange={handleAbilityChange}
             onGenerationMethodChange={handleGenerationMethodChange}
             onRollAbilities={handleRollAbilities}
@@ -330,23 +359,45 @@ export default function Home() {
                   onClick={() => handleOpenCharacterModal(savedCharacter)}
                   className="cursor-pointer rounded-2xl border border-[#ddd0bc] bg-[#fffaf3] p-4 transition hover:-translate-y-0.5 hover:border-[#b14545] hover:shadow-md"
                 >
-                  <h3 className="mb-2 text-xl font-semibold text-[#2f241c]">
-                    {savedCharacter.name || "Unnamed Character"}
-                  </h3>
+                  <div className="flex items-center justify-between gap-4">
 
-                  <div className="space-y-1 text-sm text-[#5f4d3d]">
-                    <p>
-                      <span className="font-semibold text-[#2f241c]">Race:</span>{" "}
-                      {savedCharacter.race}
-                    </p>
-                    <p>
-                      <span className="font-semibold text-[#2f241c]">Class:</span>{" "}
-                      {savedCharacter.class}
-                    </p>
-                    <p>
-                      <span className="font-semibold text-[#2f241c]">Level:</span>{" "}
-                      {savedCharacter.level}
-                    </p>
+                    {/* SOL TARAF */}
+                    <div className="flex-1">
+                      <h3 className="mb-2 text-xl font-semibold text-[#2f241c]">
+                        {savedCharacter.name || "Unnamed Character"}
+                      </h3>
+
+                      <div className="space-y-1 text-sm text-[#5f4d3d]">
+                        <p>
+                          <span className="font-semibold text-[#2f241c]">Race:</span>{" "}
+                          {savedCharacter.race}
+                        </p>
+                        <p>
+                          <span className="font-semibold text-[#2f241c]">Class:</span>{" "}
+                          {savedCharacter.class}
+                        </p>
+                        <p>
+                          <span className="font-semibold text-[#2f241c]">Level:</span>{" "}
+                          {savedCharacter.level}
+                        </p>
+                      </div>
+                    </div>
+
+                
+                    <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border-2 border-[#b14545] bg-[#f4ecdf] shadow-sm">
+                      {savedCharacter.avatarUrl ? (
+                        <img
+                          src={savedCharacter.avatarUrl}
+                          alt={savedCharacter.name || "Character avatar"}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-xl font-bold text-[#7a2f2f]">
+                          {(savedCharacter.name || "?").charAt(0).toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+
                   </div>
                 </div>
               ))}
