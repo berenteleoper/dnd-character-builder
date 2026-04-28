@@ -12,6 +12,8 @@ type AbilityInputRowProps = {
   generationMethod: AbilityGenerationMethod;
   selectedStandardArrayValue?: StandardArrayValue;
   availableStandardArrayValues?: StandardArrayValue[];
+  pointBuyValues?: number[];
+  pointBuyUsedPoints?: number;
   onChange: (abilityKey: AbilityName, nextValue: number) => void;
   onStandardArrayChange?: (
     abilityKey: AbilityName,
@@ -26,6 +28,8 @@ export default function AbilityInputRow({
   generationMethod,
   selectedStandardArrayValue,
   availableStandardArrayValues = [],
+  pointBuyValues = [],
+  pointBuyUsedPoints = 0,
   onChange,
   onStandardArrayChange,
 }: AbilityInputRowProps) {
@@ -54,9 +58,7 @@ export default function AbilityInputRow({
             <option value="">--</option>
 
             {[
-              ...(selectedStandardArrayValue
-                ? [selectedStandardArrayValue]
-                : []),
+              ...(selectedStandardArrayValue ? [selectedStandardArrayValue] : []),
               ...availableStandardArrayValues,
             ]
               .filter((value, index, array) => array.indexOf(value) === index)
@@ -66,6 +68,20 @@ export default function AbilityInputRow({
                   {arrayValue}
                 </option>
               ))}
+          </select>
+        ) : generationMethod === "pointBuy" ? (
+          <select
+            value={value}
+            onChange={(e) => {
+              onChange(abilityKey, Number(e.target.value));
+            }}
+            className="w-24 rounded-xl border border-[#d6c7b2] bg-white px-3 py-2 text-center text-[#2f241c] outline-none transition focus:border-[#b14545] focus:ring-2 focus:ring-[#b14545]/20"
+          >
+            {pointBuyValues.map((pointValue) => (
+              <option key={pointValue} value={pointValue}>
+                {pointValue}
+              </option>
+            ))}
           </select>
         ) : (
           <input

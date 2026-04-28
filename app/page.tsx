@@ -8,7 +8,10 @@ import { abilityList } from "../data/abilities";
 import { calculateModifier } from "../lib/ability";
 import {
   buildAbilitiesFromStandardArray,
+  calculatePointBuyCost,
   generateRolledAbilities,
+  getDefaultPointBuyAbilities,
+  //pointBuyCosts,
   standardArrayValues,
 } from "../lib/ability-generation";
 import type {
@@ -17,7 +20,7 @@ import type {
   Character,
   StandardArrayValue,
 } from "../types/character";
-import CharacterPreview from "../components/CharacterPreview";
+import CharacterPreview from "@/components/CharacterPreview";
 
 const initialCharacter: Character = {
   id: "",
@@ -106,6 +109,26 @@ export default function Home() {
   }
 
   function handleAbilityChange(abilityKey: AbilityName, nextValue: number) {
+    if (character.generationMethod === "pointBuy") {
+      const nextAbilities = {
+        ...character.abilities,
+        [abilityKey]: nextValue,
+      };
+
+      const nextCost = calculatePointBuyCost(nextAbilities);
+
+      if (nextCost > 27) {
+        return;
+      }
+
+      setCharacter({
+        ...character,
+        abilities: nextAbilities,
+      });
+
+      return;
+    }
+
     setCharacter({
       ...character,
       abilities: {
@@ -119,7 +142,20 @@ export default function Home() {
     setCharacter({
       ...character,
       generationMethod: method,
-      standardArrayAssignments: method === "standardArray" ? {} : {},
+      standardArrayAssignments: {},
+      abilities:
+        method === "pointBuy"
+          ? getDefaultPointBuyAbilities()
+          : method === "standardArray"
+            ? {
+              strength: 8,
+              dexterity: 8,
+              constitution: 8,
+              intelligence: 8,
+              wisdom: 8,
+              charisma: 8,
+            }
+            : character.abilities,
     });
   }
 
@@ -276,38 +312,7 @@ export default function Home() {
             saveMessage={saveMessage}
           />
 
-          <section className="rounded-3xl border border-[#c8b79e] bg-[#f8f1e7] p-6 shadow-[0_10px_30px_rgba(60,40,20,0.08)]">
-            <h2 className="mb-4 text-2xl font-semibold text-[#2f241c]">
-              {character.name || "Unnamed Character"}
-            </h2>
-
-            <div className="mb-6 grid gap-3 sm:grid-cols-2">
-              <p>
-                <span className="font-semibold">Race:</span> {character.race}
-              </p>
-              <p>
-                <span className="font-semibold">Class:</span> {character.class}
-              </p>
-              <p>
-                <span className="font-semibold">Level:</span> {character.level}
-              </p>
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {abilityList.map((ability) => {
-                const value = character.abilities[ability.key];
-
-                return (
-                  <AbilityCard
-                    key={ability.key}
-                    name={ability.label}
-                    value={value}
-                    modifier={calculateModifier(value)}
-                  />
-                );
-              })}
-            </div>
-          </section>
+          <CharacterPreview character={character} />
         </div>
 
         <section className="mt-8 rounded-3xl border border-[#c8b79e] bg-[#f8f1e7] p-6 shadow-[0_10px_30px_rgba(60,40,20,0.08)]">

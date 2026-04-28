@@ -6,6 +6,8 @@ type AbilityCardProps = {
   borderColor?: string;
   backgroundColor?: string;
   textColor?: string;
+  baseValue?: number;
+  bonusValue?: number;
 };
 
 export default function AbilityCard({
@@ -16,6 +18,8 @@ export default function AbilityCard({
   borderColor = "#b14545",
   backgroundColor = "#fffaf3",
   textColor = "#2f241c",
+  baseValue,
+  bonusValue = 0,
 }: AbilityCardProps) {
   return (
     <div
@@ -34,7 +38,15 @@ export default function AbilityCard({
       </p>
 
       <div className="mt-4 flex items-end justify-between">
-        <p className="text-6xl font-bold leading-none">{value}</p>
+        <div>
+          <p className="text-6xl font-bold leading-none">{value}</p>
+
+          {baseValue !== undefined && bonusValue > 0 && (
+            <p className="mt-2 text-xs font-semibold text-[#6a5848]">
+              Base {baseValue} + Race {bonusValue}
+            </p>
+          )}
+        </div>
 
         <div className="rounded-xl bg-[#f4ecdf] px-3 py-2">
           <p className="text-xl font-semibold" style={{ color: accentColor }}>

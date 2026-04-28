@@ -3,6 +3,7 @@ import { abilityList } from "../data/abilities";
 import { calculateModifier } from "../lib/ability";
 import { getClassTheme } from "../lib/theme";
 import type { Character } from "../types/character";
+import { getFinalAbilityScore, getRaceBonuses, getRaceTraits } from "../lib/race";
 
 type CharacterPreviewProps = {
   character: Character;
@@ -12,6 +13,17 @@ export default function CharacterPreview({
   character,
 }: CharacterPreviewProps) {
   const theme = getClassTheme(character.class);
+
+  const raceBonuses = getRaceBonuses(character.race);
+
+  const raceTraits = getRaceTraits(character.race);
+
+  const raceBonusEntries = abilityList
+    .map((ability) => ({
+      label: ability.label,
+      bonus: raceBonuses[ability.key] ?? 0,
+    }))
+    .filter((item) => item.bonus > 0);
 
   return (
     <section
@@ -73,21 +85,82 @@ export default function CharacterPreview({
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {abilityList.map((ability) => {
-          const value = character.abilities[ability.key];
+          const baseValue = character.abilities[ability.key];
+
+          const finalValue = getFinalAbilityScore(
+            ability.key,
+            character.abilities,
+            character.race
+          );
+
+          const raceBonus = getRaceBonuses(character.race)[ability.key] ?? 0;
 
           return (
             <AbilityCard
               key={ability.key}
               name={ability.label}
-              value={value}
-              modifier={calculateModifier(value)}
+              value={finalValue}
+              modifier={calculateModifier(finalValue)}
               accentColor={theme.primary}
               borderColor={theme.border}
               backgroundColor="#fffaf3"
               textColor="#2f241c"
+              baseValue={baseValue}
+              bonusValue={raceBonus}
             />
           );
         })}
+      </div>
+      <div className="mt-6 rounded-3xl border border-[#d8cab5] bg-[#fffaf3] p-5">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <h3 className="text-lg font-bold text-[#2f241c]">Race Bonuses</h3>
+
+          <span
+            className="rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.14em]"
+            style={{
+              backgroundColor: theme.soft,
+              color: theme.primary,
+              border: `1px solid ${theme.border}`,
+            }}
+          >
+            {character.race}
+          </span>
+        </div>
+
+        {raceBonusEntries.length === 0 ? (
+          <p className="text-sm text-[#6a5848]">
+            This race does not provide ability score bonuses.
+          </p>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {raceBonusEntries.map((item) => (
+              <span
+                key={item.label}
+                className="rounded-full border border-[#d8cab5] bg-[#f4ecdf] px-3 py-2 text-sm font-semibold text-[#3f3025]"
+              >
+                +{item.bonus} {item.label}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+      <div className="mt-4 rounded-3xl border border-[#d8cab5] bg-[#fffaf3] p-5">
+        <h3 className="mb-3 text-lg font-bold text-[#2f241c]">Race Traits</h3>
+
+        {raceTraits.length === 0 ? (
+          <p className="text-sm text-[#6a5848]">No race traits available.</p>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {raceTraits.map((trait) => (
+              <span
+                key={trait}
+                className="rounded-full border border-[#d8cab5] bg-[#f4ecdf] px-3 py-2 text-sm font-semibold text-[#3f3025]"
+              >
+                {trait}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

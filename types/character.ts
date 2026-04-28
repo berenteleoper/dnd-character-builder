@@ -1,4 +1,4 @@
-export type AbilityGenerationMethod = "manual" | "standardArray" | "diceRoll";
+export type AbilityGenerationMethod = "manual" | "standardArray" | "diceRoll" | "pointBuy";
 
 export type StandardArrayValue = 15 | 14 | 13 | 12 | 10 | 8;
 

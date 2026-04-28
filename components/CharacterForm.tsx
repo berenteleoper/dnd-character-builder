@@ -1,5 +1,11 @@
 import { abilityList } from "@/data/abilities";
-import { standardArrayValues } from "@/lib/ability-generation";
+import { races } from "@/data/races";
+import {
+  calculatePointBuyCost,
+  getPointBuyRemainingPoints,
+  pointBuyValues,
+  standardArrayValues,
+} from "@/lib/ability-generation";
 import type {
   AbilityGenerationMethod,
   AbilityName,
@@ -43,6 +49,8 @@ export default function CharacterForm({
   saveMessage,
 }: CharacterFormProps) {
   const assignedValues = Object.values(character.standardArrayAssignments ?? {});
+  const pointBuyUsedPoints = calculatePointBuyCost(character.abilities);
+  const pointBuyRemainingPoints = getPointBuyRemainingPoints(character.abilities);
 
   return (
     <section className="rounded-3xl border border-[#c8b79e] bg-[#f8f1e7] p-6 text-[#2f241c] shadow-[0_10px_30px_rgba(60,40,20,0.08)]">
@@ -69,11 +77,15 @@ export default function CharacterForm({
             onChange={(e) => onRaceChange(e.target.value)}
             className="w-full rounded-2xl border border-[#d6c7b2] bg-[#fffaf3] px-4 py-3 text-[#2f241c] outline-none transition focus:border-[#b14545] focus:ring-2 focus:ring-[#b14545]/20"
           >
-            <option value="Human">Human</option>
-            <option value="Elf">Elf</option>
-            <option value="Dwarf">Dwarf</option>
-            <option value="Halfling">Halfling</option>
+            {races.map((race) => (
+              <option key={race.name} value={race.name}>
+                {race.name}
+              </option>
+            ))}
           </select>
+          <p className="mt-2 text-sm text-[#6a5848]">
+            Race bonuses are applied automatically in the preview.
+          </p>
         </div>
 
         <div>
@@ -129,6 +141,7 @@ export default function CharacterForm({
             <option value="manual">Manual</option>
             <option value="standardArray">Standard Array</option>
             <option value="diceRoll">Dice Roll</option>
+            <option value="pointBuy">Point Buy</option>
           </select>
         </div>
 
@@ -146,6 +159,27 @@ export default function CharacterForm({
 
         <div>
           <h3 className="mb-3 text-lg font-semibold">Ability Scores</h3>
+
+          {character.generationMethod === "pointBuy" && (
+            <div className="mb-4 rounded-2xl border border-[#d6c7b2] bg-[#fffaf3] p-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className="font-semibold text-[#2f241c]">Point Buy</p>
+
+                <div className="flex gap-3 text-sm">
+                  <span className="rounded-full bg-[#efe3d3] px-3 py-1 font-semibold text-[#7a2f2f]">
+                    Used: {pointBuyUsedPoints}
+                  </span>
+                  <span className="rounded-full bg-[#efe3d3] px-3 py-1 font-semibold text-[#7a2f2f]">
+                    Remaining: {pointBuyRemainingPoints}
+                  </span>
+                </div>
+              </div>
+
+              <p className="mt-2 text-sm text-[#6a5848]">
+                Point Buy allows scores from 8 to 15 before racial bonuses. Total budget is 27 points.
+              </p>
+            </div>
+          )}
 
           <div className="space-y-3">
             {abilityList.map((ability) => {
@@ -166,6 +200,8 @@ export default function CharacterForm({
                   generationMethod={character.generationMethod}
                   selectedStandardArrayValue={selectedValue}
                   availableStandardArrayValues={availableValues}
+                  pointBuyValues={pointBuyValues}
+                  pointBuyUsedPoints={pointBuyUsedPoints}
                   onChange={onAbilityChange}
                   onStandardArrayChange={onStandardArrayAssignmentChange}
                 />
