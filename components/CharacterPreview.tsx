@@ -2,11 +2,18 @@ import AbilityCard from "./AbilityCard";
 import { abilityList } from "../data/abilities";
 import { calculateModifier } from "../lib/ability";
 import { getClassTheme } from "../lib/theme";
+import { getCharacterClass } from "@/lib/classes";
+import { calculateProficiencyBonus } from "../lib/level";
+import { calculateSavingThrow } from "../lib/saving-throws";
+import { calculateMaxHitPoints } from "@/lib/hit-points";
+import { calculateArmorClass, calculateInitiative } from "@/lib/combat";
+import { getWeaponByName } from "@/lib/weapon";
 import type { Character } from "../types/character";
 import {
   getCombinedRaceBonuses,
   getCombinedRaceTraits,
   getFinalAbilityScore,
+  getRaceSpeed,
 } from "../lib/race";
 
 type CharacterPreviewProps = {
@@ -17,6 +24,20 @@ export default function CharacterPreview({
   character,
 }: CharacterPreviewProps) {
   const theme = getClassTheme(character.class);
+
+  const selectedClass = getCharacterClass(character.class);
+
+  const proficiencyBonus = calculateProficiencyBonus(character.level);
+
+  const maxHitPoints = calculateMaxHitPoints(character);
+
+  const armorClass = calculateArmorClass(character);
+
+  const weapon = getWeaponByName(character.weapon);
+
+  const initiative = calculateInitiative(character);
+
+  const speed = getRaceSpeed(character.race);
 
   const raceBonuses =
     character.ruleset === "2014"
@@ -195,6 +216,164 @@ export default function CharacterPreview({
             ))}
           </div>
         )}
+      </div>
+      <div className="mt-4 rounded-3xl border border-[#d8cab5] bg-[#fffaf3] p-5">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <h3 className="text-lg font-bold text-[#2f241c]">Class Summary</h3>
+
+          <span
+            className="rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.14em]"
+            style={{
+              backgroundColor: theme.soft,
+              color: theme.primary,
+              border: `1px solid ${theme.border}`,
+            }}
+          >
+            {character.class}
+          </span>
+        </div>
+
+        {!selectedClass ? (
+          <p className="text-sm text-[#6a5848]">No class data available.</p>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <p className="text-sm font-semibold text-[#6a5848]">Hit Die</p>
+              <p className="text-lg font-bold text-[#2f241c]">d{selectedClass.hitDie}</p>
+            </div>
+
+            <div>
+              <p className="text-sm font-semibold text-[#6a5848]">Spellcasting</p>
+              <p className="text-lg font-bold text-[#2f241c]">
+                {selectedClass.isSpellcaster
+                  ? selectedClass.spellcastingAbility
+                  : "None"}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-sm font-semibold text-[#6a5848]">Primary Ability</p>
+              <p className="text-sm font-bold text-[#2f241c]">
+                {selectedClass.primaryAbilities.join(", ")}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-sm font-semibold text-[#6a5848]">Saving Throws</p>
+              <p className="text-sm font-bold text-[#2f241c]">
+                {selectedClass.savingThrows.join(", ")}
+              </p>
+            </div>
+          </div>
+
+        )}
+      </div>
+      <div className="mt-4 rounded-3xl border border-[#d8cab5] bg-[#fffaf3] p-5">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <h3 className="text-lg font-bold text-[#2f241c]">Combat Stats</h3>
+
+          <span
+            className="rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.14em]"
+            style={{
+              backgroundColor: theme.soft,
+              color: theme.primary,
+              border: `1px solid ${theme.border}`,
+            }}
+          >
+            Level {character.level}
+          </span>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-3">
+          <div className="rounded-2xl border border-[#eadcc8] bg-[#f8f1e7] p-4">
+            <p className="text-sm font-semibold text-[#6a5848]">Max HP</p>
+            <p className="text-3xl font-bold text-[#2f241c]">{maxHitPoints}</p>
+          </div>
+
+          <div className="rounded-2xl border border-[#eadcc8] bg-[#f8f1e7] p-4">
+            <p className="text-sm font-semibold text-[#6a5848]">Armor Class</p>
+            <p className="text-3xl font-bold text-[#2f241c]">{armorClass}</p>
+          </div>
+
+          <div className="rounded-2xl border border-[#eadcc8] bg-[#f8f1e7] p-4">
+            <p className="text-sm font-semibold text-[#6a5848]">Initiative</p>
+            <p className="text-3xl font-bold text-[#2f241c]">
+              {initiative >= 0 ? "+" : ""}
+              {initiative}
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-[#eadcc8] bg-[#f8f1e7] p-4">
+            <p className="text-sm font-semibold text-[#6a5848]">Speed</p>
+            <p className="text-3xl font-bold text-[#2f241c]">{speed} ft.</p>
+          </div>
+
+          <div className="rounded-2xl border border-[#eadcc8] bg-[#f8f1e7] p-4">
+            <p className="text-sm font-semibold text-[#6a5848]">Hit Die</p>
+            <p className="text-3xl font-bold text-[#2f241c]">
+              d{selectedClass?.hitDie ?? "-"}
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-[#eadcc8] bg-[#f8f1e7] p-4">
+            <p className="text-sm font-semibold text-[#6a5848]">Proficiency</p>
+            <p className="text-3xl font-bold text-[#2f241c]">+{proficiencyBonus}</p>
+          </div>
+
+          <div className="rounded-2xl border border-[#eadcc8] bg-[#f8f1e7] p-4">
+            <p className="text-sm font-semibold text-[#6a5848]">Weapon</p>
+            <p className="text-lg font-bold text-[#2f241c]">
+              {weapon.name} ({weapon.damage})
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+      <div className="mt-4 rounded-3xl border border-[#d8cab5] bg-[#fffaf3] p-5">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <h3 className="text-lg font-bold text-[#2f241c]">Proficiency & Saves</h3>
+
+          <span
+            className="rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.14em]"
+            style={{
+              backgroundColor: theme.soft,
+              color: theme.primary,
+              border: `1px solid ${theme.border}`,
+            }}
+          >
+            Proficiency +{proficiencyBonus}
+          </span>
+        </div>
+
+        <div className="grid gap-2 sm:grid-cols-2">
+          {abilityList.map((ability) => {
+            const saveValue = calculateSavingThrow(character, ability.key);
+            const isProficient =
+              selectedClass?.savingThrows.includes(ability.key) ?? false;
+
+            return (
+              <div
+                key={ability.key}
+                className="flex items-center justify-between rounded-2xl border border-[#eadcc8] bg-[#f8f1e7] px-4 py-3"
+              >
+                <div>
+                  <p className="font-semibold text-[#2f241c]">{ability.label}</p>
+                  {isProficient && (
+                    <p className="text-xs font-semibold" style={{ color: theme.primary }}>
+                      Proficient
+                    </p>
+                  )}
+                </div>
+
+                <p className="text-lg font-bold text-[#2f241c]">
+                  {saveValue >= 0 ? "+" : ""}
+                  {saveValue}
+                </p>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

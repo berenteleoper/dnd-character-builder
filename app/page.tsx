@@ -6,6 +6,7 @@ import CharacterForm from "../components/CharacterForm";
 import CharacterModal from "@/components/CharacterModal";
 import { abilityList } from "../data/abilities";
 import { calculateModifier } from "../lib/ability";
+import { getClassTheme } from "@/lib/theme";
 import {
   buildAbilitiesFromStandardArray,
   calculatePointBuyCost,
@@ -22,6 +23,7 @@ import type {
   StandardArrayValue,
 } from "../types/character";
 import CharacterPreview from "@/components/CharacterPreview";
+import next from "next";
 
 const initialCharacter: Character = {
   id: "",
@@ -34,6 +36,9 @@ const initialCharacter: Character = {
   generationMethod: "manual",
   standardArrayAssignments: {},
   avatarUrl: "",
+  armor: "None",
+  hasShield: false,
+  weapon: "None",
   abilities: {
     strength: 10,
     dexterity: 10,
@@ -208,6 +213,27 @@ export default function Home() {
     });
   }
 
+  function handleArmorChange(nextArmor: string) {
+    setCharacter({
+      ...character,
+      armor: nextArmor,
+    });
+  }
+
+  function handleShieldChange(nextHasShield: boolean) {
+    setCharacter({
+      ...character,
+      hasShield: nextHasShield,
+    });
+  }
+
+  function handleWeaponChange(nextWeapon: string) {
+    setCharacter({
+      ...character,
+      weapon: nextWeapon,
+    });
+  }
+
   function handleSaveCharacter() {
     const storedCharacters = localStorage.getItem("characters");
 
@@ -258,16 +284,22 @@ export default function Home() {
   }
 
   function handleLoadCharacterIntoForm(selected: Character) {
-    setCharacter({
-      ...selected,
-      abilities: {
-        ...selected.abilities,
-      },
-    });
-    setSelectedCharacter(null);
-    setSelectedCharacterId(null);
-    setSaveMessage("");
-  }
+  setCharacter({
+    ...selected,
+    armor: selected.armor ?? "None",
+    hasShield: selected.hasShield ?? false,
+    weapon: selected.weapon ?? "None",
+    avatarUrl: selected.avatarUrl ?? "",
+    subrace: selected.subrace ?? "",
+    abilities: {
+      ...selected.abilities,
+    },
+  });
+
+  setSelectedCharacter(null);
+  setSelectedCharacterId(null);
+  setSaveMessage("");
+}
 
   function handleDeleteCharacter() {
     if (!selectedCharacterId) return;
@@ -331,7 +363,10 @@ export default function Home() {
             onLevelChange={handleLevelChange}
             onRulesetChange={handleRulesetChange}
             onAvatarUrlChange={handleAvatarUrlChange}
+            onArmorChange={handleArmorChange}
+            onShieldChange={handleShieldChange}
             onAbilityChange={handleAbilityChange}
+            onWeaponChange={handleWeaponChange}
             onGenerationMethodChange={handleGenerationMethodChange}
             onRollAbilities={handleRollAbilities}
             onStandardArrayAssignmentChange={handleStandardArrayAssignment}
@@ -353,54 +388,82 @@ export default function Home() {
             <p className="text-[#6a5848]">No saved characters yet.</p>
           ) : (
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {savedCharacters.map((savedCharacter, index) => (
-                <div
-                  key={savedCharacter.id || index}
-                  onClick={() => handleOpenCharacterModal(savedCharacter)}
-                  className="cursor-pointer rounded-2xl border border-[#ddd0bc] bg-[#fffaf3] p-4 transition hover:-translate-y-0.5 hover:border-[#b14545] hover:shadow-md"
-                >
-                  <div className="flex items-center justify-between gap-4">
+              {savedCharacters.map((savedCharacter, index) => {
+                const theme = getClassTheme(savedCharacter.class);
 
-                    {/* SOL TARAF */}
-                    <div className="flex-1">
-                      <h3 className="mb-2 text-xl font-semibold text-[#2f241c]">
-                        {savedCharacter.name || "Unnamed Character"}
-                      </h3>
+                return (
+                  <div
+                    key={savedCharacter.id || index}
+                    onClick={() => handleOpenCharacterModal(savedCharacter)}
+                    className="cursor-pointer rounded-2xl border p-4 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
+                    style={{
+                      borderColor: theme.border,
+                      backgroundColor: "#fffaf3",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.boxShadow = `0 0 0 2px ${theme.primary}40, 0 10px 25px ${theme.primary}30`;
+                      e.currentTarget.style.borderColor = theme.primary;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.boxShadow = "none";
+                      e.currentTarget.style.borderColor = theme.border;
+                    }}
+                  >
+                    <div className="flex items-center justify-between gap-4">
 
-                      <div className="space-y-1 text-sm text-[#5f4d3d]">
-                        <p>
-                          <span className="font-semibold text-[#2f241c]">Race:</span>{" "}
-                          {savedCharacter.race}
-                        </p>
-                        <p>
-                          <span className="font-semibold text-[#2f241c]">Class:</span>{" "}
-                          {savedCharacter.class}
-                        </p>
-                        <p>
-                          <span className="font-semibold text-[#2f241c]">Level:</span>{" "}
-                          {savedCharacter.level}
-                        </p>
+                      {/* SOL TARAF */}
+                      <div className="flex-1">
+                        <h3
+                          className="mb-2 text-xl font-semibold"
+                          style={{ color: theme.text }}
+                        >
+                          {savedCharacter.name || "Unnamed Character"}
+                        </h3>
+
+                        <div className="space-y-1 text-sm text-[#5f4d3d]">
+                          <p>
+                            <span className="font-semibold text-[#2f241c]">Race:</span>{" "}
+                            {savedCharacter.race}
+                          </p>
+                          <p>
+                            <span className="font-semibold text-[#2f241c]">Class:</span>{" "}
+                            {savedCharacter.class}
+                          </p>
+                          <p>
+                            <span className="font-semibold text-[#2f241c]">Level:</span>{" "}
+                            {savedCharacter.level}
+                          </p>
+                        </div>
                       </div>
-                    </div>
 
-                
-                    <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border-2 border-[#b14545] bg-[#f4ecdf] shadow-sm">
-                      {savedCharacter.avatarUrl ? (
-                        <img
-                          src={savedCharacter.avatarUrl}
-                          alt={savedCharacter.name || "Character avatar"}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <span className="text-xl font-bold text-[#7a2f2f]">
-                          {(savedCharacter.name || "?").charAt(0).toUpperCase()}
-                        </span>
-                      )}
-                    </div>
+                      {/* AVATAR */}
+                      <div
+                        className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border-2 shadow-sm"
+                        style={{
+                          borderColor: theme.primary,
+                          backgroundColor: theme.soft,
+                        }}
+                      >
+                        {savedCharacter.avatarUrl ? (
+                          <img
+                            src={savedCharacter.avatarUrl}
+                            alt={savedCharacter.name || "Character avatar"}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <span
+                            className="text-xl font-bold"
+                            style={{ color: theme.primary }}
+                          >
+                            {(savedCharacter.name || "?").charAt(0).toUpperCase()}
+                          </span>
+                        )}
+                      </div>
 
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </section>

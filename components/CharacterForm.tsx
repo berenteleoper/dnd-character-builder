@@ -1,5 +1,10 @@
 import { abilityList } from "@/data/abilities";
 import { races } from "@/data/races";
+import { characterClasses } from "@/data/clases";
+import { armors } from "@/data/armor";
+import { weapons } from "@/data/weapons";
+import { isWeaponProficient } from "@/lib/weapon";
+import { isCharacterProficientWithArmor } from "@/lib/armor";
 import {
   calculatePointBuyCost,
   getPointBuyRemainingPoints,
@@ -24,6 +29,9 @@ type CharacterFormProps = {
   onLevelChange: (nextLevel: number) => void;
   onRulesetChange: (nextRuleset: Ruleset) => void;
   onAvatarUrlChange: (nextAvatarUrl: string) => void;
+  onArmorChange: (nextArmor: string) => void;
+  onShieldChange: (nextHasShield: boolean) => void;
+  onWeaponChange: (nextWeapon: string) => void;
   onAbilityChange: (abilityKey: AbilityName, nextValue: number) => void;
   onGenerationMethodChange: (method: AbilityGenerationMethod) => void;
   onStandardArrayAssignmentChange: (
@@ -46,6 +54,9 @@ export default function CharacterForm({
   onLevelChange,
   onRulesetChange,
   onAvatarUrlChange,
+  onArmorChange,
+  onShieldChange,
+  onWeaponChange,
   onAbilityChange,
   onGenerationMethodChange,
   onStandardArrayAssignmentChange,
@@ -60,6 +71,15 @@ export default function CharacterForm({
   const availableSubraces = selectedRace?.subraces ?? [];
   const pointBuyUsedPoints = calculatePointBuyCost(character.abilities);
   const pointBuyRemainingPoints = getPointBuyRemainingPoints(character.abilities);
+  const isArmorProficient = isCharacterProficientWithArmor(
+    character.class,
+    character.armor ?? "None",
+    character.hasShield ?? false
+  );
+  const isWeaponOk = isWeaponProficient(
+    character.class,
+    character.weapon ?? "None"
+  );
 
   return (
     <section className="rounded-3xl border border-[#c8b79e] bg-[#f8f1e7] p-6 text-[#2f241c] shadow-[0_10px_30px_rgba(60,40,20,0.08)]">
@@ -137,18 +157,11 @@ export default function CharacterForm({
             onChange={(e) => onClassChange(e.target.value)}
             className="w-full rounded-2xl border border-[#d6c7b2] bg-[#fffaf3] px-4 py-3 text-[#2f241c] outline-none transition focus:border-[#b14545] focus:ring-2 focus:ring-[#b14545]/20"
           >
-            <option value="Fighter">Fighter</option>
-            <option value="Wizard">Wizard</option>
-            <option value="Rogue">Rogue</option>
-            <option value="Cleric">Cleric</option>
-            <option value="Druid">Druid</option>
-            <option value="Warlock">Warlock</option>
-            <option value="Barbarian">Barbarian</option>
-            <option value="Paladin">Paladin</option>
-            <option value="Ranger">Ranger</option>
-            <option value="Bard">Bard</option>
-            <option value="Monk">Monk</option>
-            <option value="Sorcerer">Sorcerer</option>
+            {characterClasses.map((characterClass) => (
+              <option key={characterClass.name} value={characterClass.name}>
+                {characterClass.name}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -183,6 +196,59 @@ export default function CharacterForm({
             className="w-full rounded-2xl border border-[#d6c7b2] bg-[#fffaf3] px-4 py-3 text-[#2f241c] outline-none transition focus:border-[#b14545] focus:ring-2 focus:ring-[#b14545]/20"
           />
         </div>
+
+        <div>
+          <label className="mb-1 block text-sm font-medium">Weapon</label>
+          <select
+            value={character.weapon ?? "None"}
+            onChange={(e) => onWeaponChange(e.target.value)}
+            className="w-full rounded-2xl border border-[#d6c7b2] bg-[#fffaf3] px-4 py-3 text-[#2f241c]"
+          >
+            {weapons.map((weapon) => (
+              <option key={weapon.name} value={weapon.name}>
+                {weapon.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {!isWeaponOk && (
+          <p className="rounded-2xl border border-amber-400 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800">
+            Your class is not proficient with this weapon.
+          </p>
+        )}
+
+        <div>
+          <label className="mb-1 block text-sm font-medium">Armor</label>
+          <select
+            value={character.armor ?? "None"}
+            onChange={(e) => onArmorChange(e.target.value)}
+            className="w-full rounded-2xl border border-[#d6c7b2] bg-[#fffaf3] px-4 py-3 text-[#2f241c] outline-none transition focus:border-[#b14545] focus:ring-2 focus:ring-[#b14545]/20"
+          >
+            {armors.map((armor) => (
+              <option key={armor.name} value={armor.name}>
+                {armor.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <label className="flex items-center gap-3 rounded-2xl border border-[#d6c7b2] bg-[#fffaf3] px-4 py-3">
+          <input
+            type="checkbox"
+            checked={character.hasShield ?? false}
+            onChange={(e) => onShieldChange(e.target.checked)}
+            className="h-4 w-4"
+          />
+          <span className="text-sm font-medium text-[#2f241c]">Use Shield (+2 AC)</span>
+        </label>
+
+        {!isArmorProficient && (
+          <p className="rounded-2x1 border border-amber-400 bg-amber-50 px-4 py-3 text-sm font medium text-amber-800">
+            Your class is not proficient with this armor or shield. You can still select it,
+            but it may cause penalties depending on the rules you use.
+          </p>
+        )}
 
         <div>
           <label className="mb-2 block text-sm font-semibold">

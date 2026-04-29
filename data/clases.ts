@@ -1,0 +1,166 @@
+import type { AbilityName } from "@/types/character";
+
+export type CharacterClass = {
+    name: string;
+    hitDie: number;
+    primaryAbilities: AbilityName[];
+    savingThrows: AbilityName[];
+    armorProficiencies: string[];
+    weaponProficiencies: string[];
+    isSpellcaster: boolean;
+    spellcastingAbility?: AbilityName;
+};
+
+export const characterClasses: CharacterClass[] = [
+    {
+        name: "Fighter",
+        hitDie: 10,
+        primaryAbilities: ["strength", "dexterity"],
+        savingThrows: ["strength", "constitution"],
+        armorProficiencies: ["Light Armor", "Medium Armor", "Heavy Armor", "Shields"],
+        weaponProficiencies: ["Simple Weapons", "Martial Weapons"],
+        isSpellcaster: false,
+    },
+    {
+        name: "Rogue",
+        hitDie: 8,
+        primaryAbilities: ["dexterity"],
+        savingThrows: ["dexterity", "intelligence"],
+        armorProficiencies: ["Light Armor"],
+        weaponProficiencies: [
+            "Simple Weapons",
+            "Hand Crossbows",
+            "Longswords",
+            "Rapiers",
+            "Shortswords",
+        ],
+        isSpellcaster: false,
+    },
+    {
+        name: "Wizard",
+        hitDie: 6,
+        primaryAbilities: ["intelligence"],
+        savingThrows: ["intelligence", "wisdom"],
+        armorProficiencies: [],
+        weaponProficiencies: [
+            "Daggers",
+            "Darts",
+            "Slings",
+            "Quarterstaffs",
+            "Light Crossbows",
+        ],
+        isSpellcaster: true,
+        spellcastingAbility: "intelligence",
+    },
+    {
+        name: "Cleric",
+        hitDie: 8,
+        primaryAbilities: ["wisdom"],
+        savingThrows: ["wisdom", "charisma"],
+        armorProficiencies: ["Light Armor", "Medium Armor", "Shields"],
+        weaponProficiencies: ["Simple Weapons"],
+        isSpellcaster: true,
+        spellcastingAbility: "wisdom",
+    },
+    {
+        name: "Druid",
+        hitDie: 8,
+        primaryAbilities: ["wisdom"],
+        savingThrows: ["intelligence", "wisdom"],
+        armorProficiencies: ["Light Armor", "Medium Armor", "Shields"],
+        weaponProficiencies: [
+            "Clubs",
+            "Daggers",
+            "Darts",
+            "Javelins",
+            "Maces",
+            "Quarterstaffs",
+            "Scimitars",
+            "Sickles",
+            "Slings",
+            "Spears",
+        ],
+        isSpellcaster: true,
+        spellcastingAbility: "wisdom",
+    },
+    {
+        name: "Warlock",
+        hitDie: 8,
+        primaryAbilities: ["charisma"],
+        savingThrows: ["wisdom", "charisma"],
+        armorProficiencies: ["Light Armor"],
+        weaponProficiencies: ["Simple Weapons"],
+        isSpellcaster: true,
+        spellcastingAbility: "charisma",
+    },
+    {
+        name: "Barbarian",
+        hitDie: 12,
+        primaryAbilities: ["strength"],
+        savingThrows: ["strength", "constitution"],
+        armorProficiencies: ["Light Armor", "Medium Armor", "Shields"],
+        weaponProficiencies: ["Simple Weapons", "Martial Weapons"],
+        isSpellcaster: false,
+    },
+    {
+        name: "Paladin",
+        hitDie: 10,
+        primaryAbilities: ["strength", "charisma"],
+        savingThrows: ["wisdom", "charisma"],
+        armorProficiencies: ["Light Armor", "Medium Armor", "Heavy Armor", "Shields"],
+        weaponProficiencies: ["Simple Weapons", "Martial Weapons"],
+        isSpellcaster: true,
+        spellcastingAbility: "charisma",
+    },
+    {
+        name: "Ranger",
+        hitDie: 10,
+        primaryAbilities: ["dexterity", "wisdom"],
+        savingThrows: ["strength", "dexterity"],
+        armorProficiencies: ["Light Armor", "Medium Armor", "Shields"],
+        weaponProficiencies: ["Simple Weapons", "Martial Weapons"],
+        isSpellcaster: true,
+        spellcastingAbility: "wisdom",
+    },
+    {
+        name: "Bard",
+        hitDie: 8,
+        primaryAbilities: ["charisma"],
+        savingThrows: ["dexterity", "charisma"],
+        armorProficiencies: ["Light Armor"],
+        weaponProficiencies: [
+            "Simple Weapons",
+            "Hand Crossbows",
+            "Longswords",
+            "Rapiers",
+            "Shortswords",
+        ],
+        isSpellcaster: true,
+        spellcastingAbility: "charisma",
+    },
+    {
+        name: "Monk",
+        hitDie: 8,
+        primaryAbilities: ["dexterity", "wisdom"],
+        savingThrows: ["strength", "dexterity"],
+        armorProficiencies: [],
+        weaponProficiencies: ["Simple Weapons", "Shortswords"],
+        isSpellcaster: false,
+    },
+    {
+        name: "Sorcerer",
+        hitDie: 6,
+        primaryAbilities: ["charisma"],
+        savingThrows: ["constitution", "charisma"],
+        armorProficiencies: [],
+        weaponProficiencies: [
+            "Daggers",
+            "Darts",
+            "Slings",
+            "Quarterstaffs",
+            "Light Crossbows",
+        ],
+        isSpellcaster: true,
+        spellcastingAbility: "charisma",
+    },
+];

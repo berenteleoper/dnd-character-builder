@@ -30,8 +30,11 @@ export type Character = {
     level: number;
     ruleset: Ruleset;
     generationMethod: AbilityGenerationMethod;
-    abilities: AbilityScores;
     standardArrayAssignments?: Partial<Record<AbilityName, StandardArrayValue>>;
     avatarUrl: string;
+    armor: string;
+    hasShield: boolean;
+    abilities: AbilityScores;
+    weapon: string;
 }
 

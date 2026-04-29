@@ -78,3 +78,8 @@ export function getCombinedRaceTraits(raceName: string, subraceName: string): st
     ...getSubraceTraits(raceName, subraceName),
   ];
 }
+
+export function getRaceSpeed(raceName: string): number {
+    const race = getRace(raceName);
+    return race?.speed ?? 30;
+}

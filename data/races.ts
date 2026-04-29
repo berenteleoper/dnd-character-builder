@@ -10,6 +10,7 @@ export type Race = {
     name: string;
     bonuses: Partial<Record<AbilityName, number>>;
     traits: string[];
+    speed: number;
     subraces?: Subrace[];
 };
 
@@ -24,7 +25,8 @@ export const races: Race[] = [
             wisdom: 1,
             charisma: 1,
         },
-        traits: ["Extra Language"]
+        traits: ["Extra Language"],
+        speed: 30,
     },
     {
         name: "Dwarf",
@@ -32,6 +34,7 @@ export const races: Race[] = [
             constitution: 2,
         },
         traits: ["Darkvision", "Dwarven Resilience", "Dwarwen Combat Training", "Stonecunning"],
+        speed: 25,
         subraces: [
             {
                 name: "Hill Dwarf",
@@ -55,6 +58,7 @@ export const races: Race[] = [
             dexterity: 2,
         },
         traits: ["Darkvision", "Keen Senses", "Fey Ancestry", "Trance"],
+        speed: 30,
         subraces: [
             {
                 name: "High Elf",
@@ -85,6 +89,7 @@ export const races: Race[] = [
             dexterity: 2,
         },
         traits: ["Lucky", "Brave", "Halfling Nimbleness"],
+        speed: 25,
         subraces: [
             {
                 name: "Lightfoot Halfling",
@@ -109,6 +114,7 @@ export const races: Race[] = [
             charisma: 1,
         },
         traits: ["Draconic Ancestry", "Breath Weapon", "Damage Resistance"],
+        speed: 30,
         subraces: [
             {
                 name: "Black Dragonborn",
@@ -143,6 +149,7 @@ export const races: Race[] = [
             intelligence: 2,
         },
         traits: ["Darkvision", "Gnome Cunning"],
+        speed: 25,
         subraces: [
             {
                 name: "Forest Gnome",
@@ -166,6 +173,7 @@ export const races: Race[] = [
             charisma: 2,
         },
         traits: ["+1 to Two Other Ability Scores", "Darkvision", "Fey Ancestry", "Skill Versatility"],
+        speed: 30,
         subraces: [
             {
                 name: "High Half-Elf",
@@ -196,7 +204,8 @@ export const races: Race[] = [
             strength: 2,
             constitution: 1,
         },
-        traits: ["Darkvision", "Menacing", "Relentless"]
+        traits: ["Darkvision", "Menacing", "Relentless"],
+        speed: 30,
     },
     {
         name: "Tiefling",
@@ -205,6 +214,7 @@ export const races: Race[] = [
             charisma: 2,
         },
         traits: ["Darkvision", "Hellish Resistance", "Infernal Legacy"],
+        speed: 30,
         subraces: [
             {
                 name: "Asmodeus Tiefling",
@@ -235,6 +245,7 @@ export const races: Race[] = [
             charisma: 2,
         },
         traits: ["Darkvision", "Celestial Resistance", "Healing Hands", "Light Bearer"],
+        speed: 30,
         subraces: [
             {
                 name: "Protector Aasimar",
@@ -259,7 +270,8 @@ export const races: Race[] = [
             dexterity: 1,
             strength: 2,
         },
-        traits: ["Darkvision", "Long-Limbed", "Powerful Build", "Sneaky", "Surprise Attack"]
+        traits: ["Darkvision", "Long-Limbed", "Powerful Build", "Sneaky", "Surprise Attack"],
+        speed: 30,
     },
     {
         name: "Firbolg",
@@ -267,7 +279,8 @@ export const races: Race[] = [
             wisdom: 2,
             strength: 1,
         },
-        traits: ["Firbolg Magic", "Hidden Step", "Powerful Build", "Speech of Beast and Leaf"]
+        traits: ["Firbolg Magic", "Hidden Step", "Powerful Build", "Speech of Beast and Leaf"],
+        speed: 30,
     },
     {
         name: "Goblin",
@@ -275,7 +288,8 @@ export const races: Race[] = [
             dexterity: 2,
             constitution: 1,
         },
-        traits: ["Darkvision", "Fury of the Small", "Nimble Escape"]
+        traits: ["Darkvision", "Fury of the Small", "Nimble Escape"],
+        speed: 30,
     },
     {
         name: "Hobgoblin",
@@ -283,7 +297,8 @@ export const races: Race[] = [
             intelligence: 1,
             constitution: 2
         },
-        traits: ["Darkvision", "Martial Training", "Saving Face"]
+        traits: ["Darkvision", "Martial Training", "Saving Face"],
+        speed: 30,
     },
     {
         name: "Kenku",
@@ -291,14 +306,16 @@ export const races: Race[] = [
             dexterity: 2,
             wisdom: 1,
         },
-        traits: ["Expert Forgery", "Kenku Training", "Mimicry"]
+        traits: ["Expert Forgery", "Kenku Training", "Mimicry"],
+        speed: 30,
     },
     {
         name: "Kobold",
         bonuses: {
             dexterity: 2,
         },
-        traits: ["Darkvision", "Grovel", "Cower and Beg", "Pack Tactics", "Sunlight Sensitivity"]
+        traits: ["Darkvision", "Grovel", "Cower and Beg", "Pack Tactics", "Sunlight Sensitivity"],
+        speed: 30,
     },
     {
         name: "Lizardfolk",
@@ -306,7 +323,8 @@ export const races: Race[] = [
             constitution: 2,
             wisdom: 1,
         },
-        traits: ["Bite", "Cunning Artisan", "Hold Breath", "Hunter's Lore", "Natural Armor", "Hungry Jaws"]
+        traits: ["Bite", "Cunning Artisan", "Hold Breath", "Hunter's Lore", "Natural Armor", "Hungry Jaws"],
+        speed: 30,
     },
     {
         name: "Orcs",
@@ -315,6 +333,7 @@ export const races: Race[] = [
             constitution: 1,
         },
         traits: ["Darkvision", "Aggressive", "Primal Intuition", "Powerful Build"],
+        speed: 30,
         subraces: [
             {
                 name: "Gray Orc",
@@ -329,7 +348,8 @@ export const races: Race[] = [
             dexterity: 2,
             charisma: 1,
         },
-        traits: ["Darkvision", "Feline Agility", "Cat's Claws", "Cat's Talents"]
+        traits: ["Darkvision", "Feline Agility", "Cat's Claws", "Cat's Talents"],
+        speed: 30,
     },
     {
         name: "Triton",
@@ -338,7 +358,8 @@ export const races: Race[] = [
             constitution: 1,
             charisma: 1,
         },
-        traits: ["Amphibious", "Control Air and Water", "Emissary of the Sea"]
+        traits: ["Amphibious", "Control Air and Water", "Emissary of the Sea"],
+        speed: 30,
     },
     {
         name: "Yuan-ti",
@@ -347,6 +368,7 @@ export const races: Race[] = [
             intelligence: 1,
         },
         traits: ["Darkvision", "Innate Spellcasting", "Magic Resistance", "Poison Immunity"],
+        speed: 30,
         subraces: [
             {
                 name: "Pureblood",
@@ -361,7 +383,8 @@ export const races: Race[] = [
             dexterity: 2,
             wisdom: 1,
         },
-        traits: ["Flight", "Talons"]
+        traits: ["Flight", "Talons"],
+        speed: 30,
     },
     {
         name: "Genasi",
@@ -369,6 +392,7 @@ export const races: Race[] = [
             constitution: 2,
         },
         traits: [],
+        speed: 30,
         subraces: [
             {
                 name: "Air Genasi",
@@ -406,6 +430,7 @@ export const races: Race[] = [
             strength: 2,
             constitution: 1,
         },
-        traits: ["Natural Athlete", "Stone's Endurance", "Powerful Build", "Mountain Born"]
+        traits: ["Natural Athlete", "Stone's Endurance", "Powerful Build", "Mountain Born"],
+        speed: 30,
     },
 ];
