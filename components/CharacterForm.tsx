@@ -5,6 +5,9 @@ import { armors } from "@/data/armor";
 import { weapons } from "@/data/weapons";
 import { isWeaponProficient } from "@/lib/weapon";
 import { isCharacterProficientWithArmor } from "@/lib/armor";
+import { getAvailableSpellsForClass } from "@/lib/spells";
+import { getCantripLimit, getKnownSpellLimit } from "@/lib/spell-limits";
+import { isSpellcaster } from "@/lib/spellcasting";
 import {
   calculatePointBuyCost,
   getPointBuyRemainingPoints,
@@ -19,6 +22,7 @@ import type {
   StandardArrayValue,
 } from "../types/character";
 import AbilityInputRow from "./AbilityInputRow";
+import { spells } from "@/data/spells";
 
 type CharacterFormProps = {
   character: Character;
@@ -31,6 +35,7 @@ type CharacterFormProps = {
   onAvatarUrlChange: (nextAvatarUrl: string) => void;
   onArmorChange: (nextArmor: string) => void;
   onShieldChange: (nextHasShield: boolean) => void;
+  onToggleSpell: (spellName: string) => void;
   onWeaponChange: (nextWeapon: string) => void;
   onAbilityChange: (abilityKey: AbilityName, nextValue: number) => void;
   onGenerationMethodChange: (method: AbilityGenerationMethod) => void;
@@ -56,6 +61,7 @@ export default function CharacterForm({
   onAvatarUrlChange,
   onArmorChange,
   onShieldChange,
+  onToggleSpell,
   onWeaponChange,
   onAbilityChange,
   onGenerationMethodChange,
@@ -71,6 +77,8 @@ export default function CharacterForm({
   const availableSubraces = selectedRace?.subraces ?? [];
   const pointBuyUsedPoints = calculatePointBuyCost(character.abilities);
   const pointBuyRemainingPoints = getPointBuyRemainingPoints(character.abilities);
+  const characterIsSpellcaster = isSpellcaster(character);
+  const availableSpells = getAvailableSpellsForClass(character.class);
   const isArmorProficient = isCharacterProficientWithArmor(
     character.class,
     character.armor ?? "None",
@@ -80,6 +88,21 @@ export default function CharacterForm({
     character.class,
     character.weapon ?? "None"
   );
+
+  const selectedSpells = character.spells ?? [];
+
+  const selectedCantripCount = selectedSpells.filter((spellName) => {
+    const spell = availableSpells.find((s) => s.name === spellName);
+    return spell?.level === 0;
+  }).length;
+
+  const selectedLeveledSpellCount = selectedSpells.filter((spellName) => {
+    const spell = availableSpells.find((s) => s.name === spellName);
+    return spell && spell.level > 0;
+  }).length;
+
+  const cantripLimit = getCantripLimit(character.class, character.level);
+  const knownSpellLimit = getKnownSpellLimit(character.class, character.level);
 
   return (
     <section className="rounded-3xl border border-[#c8b79e] bg-[#f8f1e7] p-6 text-[#2f241c] shadow-[0_10px_30px_rgba(60,40,20,0.08)]">
@@ -248,6 +271,53 @@ export default function CharacterForm({
             Your class is not proficient with this armor or shield. You can still select it,
             but it may cause penalties depending on the rules you use.
           </p>
+        )}
+
+        {characterIsSpellcaster && (
+          <div className="rounded-3xl border border-[#d8cab5] bg-[#fffaf3] p-4">
+            <h3 className="mb-3 text-lg font-bold text-[#2f241c]">Spells</h3>
+
+            <p className="mb-3 text-sm text-[#6a5848]">
+              Cantrips: {selectedCantripCount}/{cantripLimit} • Spells:{" "}
+              {selectedLeveledSpellCount}/{knownSpellLimit}
+            </p>
+
+            <div className="space-y-2">
+              {availableSpells.map((spell) => {
+                const isSelected = selectedSpells.includes(spell.name);
+                const isCantrip = spell.level === 0;
+
+                const reachedLimit = isCantrip
+                  ? selectedCantripCount >= cantripLimit
+                  : selectedLeveledSpellCount >= knownSpellLimit;
+
+                const isDisabled = !isSelected && reachedLimit;
+
+                return (
+                  <label
+                    key={spell.name}
+                    className={`flex cursor-pointer items-center justify-between gap-3 rounded-2xl border border-[#eadcc8] bg-[#f8f1e7] px-4 py-3 ${isDisabled ? "opacity-50" : ""
+                      }`}
+                  >
+                    <div>
+                      <p className="font-semibold text-[#2f241c]">{spell.name}</p>
+                      <p className="text-sm text-[#6a5848]">
+                        Level {spell.level === 0 ? "Cantrip" : spell.level} •{" "}
+                        {spell.school}
+                      </p>
+                    </div>
+
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      disabled={isDisabled}
+                      onChange={() => onToggleSpell(spell.name)}
+                    />
+                  </label>
+                );
+              })}
+            </div>
+          </div>
         )}
 
         <div>

@@ -28,6 +28,7 @@ export type Character = {
     subrace: string;
     class: string;
     level: number;
+    spells: string[];
     ruleset: Ruleset;
     generationMethod: AbilityGenerationMethod;
     standardArrayAssignments?: Partial<Record<AbilityName, StandardArrayValue>>;

@@ -7,7 +7,13 @@ import { calculateProficiencyBonus } from "../lib/level";
 import { calculateSavingThrow } from "../lib/saving-throws";
 import { calculateMaxHitPoints } from "@/lib/hit-points";
 import { calculateArmorClass, calculateInitiative } from "@/lib/combat";
-import { getWeaponByName } from "@/lib/weapon";
+import { getSpellByName } from "@/lib/spells";
+import {
+  calculateWeaponAttackBonus,
+  calculateWeaponDamageBonus,
+  getWeaponByName,
+  isWeaponProficient,
+} from "../lib/weapon";
 import type { Character } from "../types/character";
 import {
   getCombinedRaceBonuses,
@@ -15,6 +21,12 @@ import {
   getFinalAbilityScore,
   getRaceSpeed,
 } from "../lib/race";
+import {
+  calculateSpellAttackBonus,
+  calculateSpellSaveDc,
+  getSpellcastingAbility,
+  isSpellcaster,
+} from "../lib/spellcasting";
 
 type CharacterPreviewProps = {
   character: Character;
@@ -33,7 +45,13 @@ export default function CharacterPreview({
 
   const armorClass = calculateArmorClass(character);
 
-  const weapon = getWeaponByName(character.weapon);
+  const weapon = getWeaponByName(character.weapon ?? "None");
+  const weaponAttackBonus = calculateWeaponAttackBonus(character);
+  const weaponDamageBonus = calculateWeaponDamageBonus(character);
+  const isCurrentWeaponProficient = isWeaponProficient(
+    character.class,
+    character.weapon ?? "None"
+  );
 
   const initiative = calculateInitiative(character);
 
@@ -55,6 +73,11 @@ export default function CharacterPreview({
       bonus: raceBonuses[ability.key] ?? 0,
     }))
     .filter((item) => item.bonus > 0);
+
+  const characterIsSpellcaster = isSpellcaster(character);
+  const spellcastingAbility = getSpellcastingAbility(character);
+  const spellSaveDc = calculateSpellSaveDc(character);
+  const spellAttackBonus = calculateSpellAttackBonus(character);
 
   return (
     <section
@@ -323,12 +346,102 @@ export default function CharacterPreview({
           <div className="rounded-2xl border border-[#eadcc8] bg-[#f8f1e7] p-4">
             <p className="text-sm font-semibold text-[#6a5848]">Weapon</p>
             <p className="text-lg font-bold text-[#2f241c]">
-              {weapon.name} ({weapon.damage})
+              {weapon.name === "None" ? "None" : `${weapon.name} (${weapon.damage})`}
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-[#eadcc8] bg-[#f8f1e7] p-4">
+            <p className="text-sm font-semibold text-[#6a5848]">Attack Bonus</p>
+            <p className="text-3xl font-bold text-[#2f241c]">
+              {weapon.name === "None" ? "-" : `${weaponAttackBonus >= 0 ? "+" : ""}${weaponAttackBonus}`}
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-[#eadcc8] bg-[#f8f1e7] p-4">
+            <p className="text-sm font-semibold text-[#6a5848]">Damage</p>
+            <p className="text-2xl font-bold text-[#2f241c]">
+              {weapon.name === "None"
+                ? "-"
+                : `${weapon.damage} ${weaponDamageBonus >= 0 ? "+" : ""}${weaponDamageBonus}`}
             </p>
           </div>
         </div>
 
       </div>
+
+      {characterIsSpellcaster && (
+        <div className="mt-4 rounded-3xl border border-[#d8cab5] bg-[#fffaf3] p-5">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <h3 className="text-lg font-bold text-[#2f241c]">Spellcasting</h3>
+
+            <span
+              className="rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.14em]"
+              style={{
+                backgroundColor: theme.soft,
+                color: theme.primary,
+                border: `1px solid ${theme.border}`,
+              }}
+            >
+              {spellcastingAbility ?? "None"}
+            </span>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div className="rounded-2xl border border-[#eadcc8] bg-[#f8f1e7] p-4">
+              <p className="text-sm font-semibold text-[#6a5848]">Spell Ability</p>
+              <p className="text-xl font-bold capitalize text-[#2f241c]">
+                {spellcastingAbility}
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-[#eadcc8] bg-[#f8f1e7] p-4">
+              <p className="text-sm font-semibold text-[#6a5848]">Spell Save DC</p>
+              <p className="text-3xl font-bold text-[#2f241c]">
+                {spellSaveDc ?? "-"}
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-[#eadcc8] bg-[#f8f1e7] p-4">
+              <p className="text-sm font-semibold text-[#6a5848]">Spell Attack</p>
+              <p className="text-3xl font-bold text-[#2f241c]">
+                {spellAttackBonus === null
+                  ? "-"
+                  : `${spellAttackBonus >= 0 ? "+" : ""}${spellAttackBonus}`}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {characterIsSpellcaster && (
+        <div className="mt-4 rounded-3xl border border-[#d8cab5] bg-[#fffaf3] p-5">
+          <h3 className="mb-3 text-lg font-bold text-[#2f241c]">Selected Spells</h3>
+
+          {(character.spells ?? []).length === 0 ? (
+            <p className="text-sm text-[#6a5848]">No spells selected yet.</p>
+          ) : (
+            <div className="grid gap-2 sm:grid-cols-2">
+              {(character.spells ?? []).map((spellName) => {
+                const spell = getSpellByName(spellName);
+
+                return (
+                  <div
+                    key={spellName}
+                    className="rounded-2xl border border-[#eadcc8] bg-[#f8f1e7] px-4 py-3"
+                  >
+                    <p className="font-semibold text-[#2f241c]">{spellName}</p>
+                    {spell && (
+                      <p className="text-sm text-[#6a5848]">
+                        Level {spell.level === 0 ? "Cantrip" : spell.level} • {spell.school}
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="mt-4 rounded-3xl border border-[#d8cab5] bg-[#fffaf3] p-5">
         <div className="mb-3 flex items-center justify-between gap-3">

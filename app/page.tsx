@@ -32,6 +32,7 @@ const initialCharacter: Character = {
   subrace: "",
   class: "Fighter",
   level: 1,
+  spells: [],
   ruleset: "2014",
   generationMethod: "manual",
   standardArrayAssignments: {},
@@ -122,6 +123,7 @@ export default function Home() {
     setCharacter({
       ...character,
       class: nextClass,
+      spells: [],
     });
   }
 
@@ -234,6 +236,17 @@ export default function Home() {
     });
   }
 
+  function handleToggleSpell(spellName: string) {
+    const alreadySelected = character.spells.includes(spellName);
+
+    setCharacter({
+      ...character,
+      spells: alreadySelected
+        ? character.spells.filter((spell) => spell !== spellName)
+        : [...character.spells, spellName],
+    });
+  }
+
   function handleSaveCharacter() {
     const storedCharacters = localStorage.getItem("characters");
 
@@ -259,7 +272,7 @@ export default function Home() {
 
     localStorage.setItem("characters", JSON.stringify(characters));
     setSavedCharacters(characters);
-    setCharacter(characterToSave);
+    setCharacter(initialCharacter);
 
     setSaveMessage("Character saved!");
 
@@ -291,6 +304,7 @@ export default function Home() {
     weapon: selected.weapon ?? "None",
     avatarUrl: selected.avatarUrl ?? "",
     subrace: selected.subrace ?? "",
+    spells: selected.spells ?? [],
     abilities: {
       ...selected.abilities,
     },
@@ -365,6 +379,7 @@ export default function Home() {
             onAvatarUrlChange={handleAvatarUrlChange}
             onArmorChange={handleArmorChange}
             onShieldChange={handleShieldChange}
+            onToggleSpell={handleToggleSpell}
             onAbilityChange={handleAbilityChange}
             onWeaponChange={handleWeaponChange}
             onGenerationMethodChange={handleGenerationMethodChange}
